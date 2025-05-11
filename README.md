@@ -29,6 +29,11 @@ GO version 2025-03-16
 
 ./preprocessing/create_blastdbs.sh
 
-Uniref version 2025_02 released on 23.04.2025
+Uniref version 2022_0? 
 
-All downloaded on 11.05.2025
+All except uniref updated on 11.05.2025
+
+
+<!-- TODO docker container with only data/datasets. -->
+
+<!-- https://github.com/agemagician/ProtTrans/blob/master/Embedding/prott5_embedder.py -->
