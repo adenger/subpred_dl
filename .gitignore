@@ -172,3 +172,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+data/raw/goa/goa_uniprot_all_ebi_filtered.tsv.gz
+data/raw/ontologies/go.obo
+data/raw/uniref/uniref50/uniref50.fasta.gz
+data/datasets/blastdb/uniref50/uniref50*
+data/datasets/blastdb/uniref90/uniref90*
+data/raw/uniprot/uniprot_evidence1-2_nofragments.tsv
+data/raw/uniref/uniref90/uniref90.fasta.gz

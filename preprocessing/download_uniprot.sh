@@ -1,0 +1,2 @@
+#!/bin/bash
+python3 preprocessing/uniprot_downloader.py "https://rest.uniprot.org/uniprotkb/search?compressed=false&fields=accession%2Cgene_names%2Cprotein_name%2Creviewed%2Cprotein_existence%2Csequence%2Corganism_id%2Cgo_id%2Ckeywordid%2Ckeyword%2Cxref_tcdb%2Cxref_interpro&format=tsv&query=%28%28fragment%3Afalse%29%20AND%20%28existence%3A1%29%20OR%20%28existence%3A2%29%29&size=500" "data/raw/uniprot/uniprot_evidence1-2_nofragments.tsv"

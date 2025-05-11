@@ -1,0 +1,44 @@
+name: subpred_deeplearning
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - cython
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+  - black
+  - ipykernel
+  - joblib
+  - matplotlib
+  - seaborn
+  - fastcluster
+  - bioconda::cd-hit
+  - bioconda::blast
+  - openpyxl
+  - ca-certificates
+  - certifi
+  - openssl
+  - obonet
+  - keras
+  - tensorflow
+  # - conda-forge::yellowbrick
+  # - conda-forge::imbalanced-learn
+  # - flake8
+  # - nbconvert
+  # - jupyter
+  # - conda-forge::owlready2
+  # - venn
+  # - mmseqs2
+  # - gensim
+  # - h5py
+  # - tabulate
+  # - pygraphviz
+  # - pigz
+  # - rdkit
+  # - rpy2
+  # - bioconductor-gosemsim
+  # - r-future.apply
+  # - bioconductor-org.sc.sgd.db
