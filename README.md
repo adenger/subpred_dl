@@ -33,6 +33,7 @@ Uniref version 2022_0?
 
 All except uniref updated on 11.05.2025
 
+<!-- TODO backup and restore of pickles -->
 
 <!-- TODO docker container with only data/datasets. -->
 
