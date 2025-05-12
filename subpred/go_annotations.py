@@ -1,6 +1,7 @@
 """
 @author: adenger
 """
+
 from subpred.util import load_data
 import networkx as nx
 import pandas as pd
@@ -119,11 +120,10 @@ def __get_go_annotations(
     return df_uniprot_goa
 
 
-
 def __add_ancestors(df_uniprot_goa, graph_go):
     df_uniprot_goa["go_id_ancestor"] = df_uniprot_goa.go_id.map(
         lambda go_id: {go_id} | set(nx.descendants(graph_go, go_id))
-    ) # TODO this is very slow for larger graphs. try multithreading with joblib, or nx-cugraph
+    )  # TODO this is very slow for larger graphs. multithreading did not improve running time by much, maybe try nx-cugraph or nx-parallel
 
     df_uniprot_goa = df_uniprot_goa.explode("go_id_ancestor")
     df_uniprot_goa = df_uniprot_goa.reset_index(drop=True)
