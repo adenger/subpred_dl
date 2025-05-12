@@ -1,2 +1,2 @@
 #!/bin/bash
-curl https://release.geneontology.org/2025-03-16/ontology/go.obo > data/raw/ontologies/go.obo
+curl https://purl.obolibrary.org/obo/go.obo > data/raw/ontologies/go.obo

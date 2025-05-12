@@ -137,29 +137,6 @@ def get_transmembrane_transporter_dataset(
         annotations_evidence_codes_remove={"IEA"} if exclude_iea_go_terms else None,
     )
 
-    # # First, get all sequences with filtering criteria:
-    # df_sequences = get_sequence_dataset(
-    #     datasets_path=datasets_path,
-    #     organism_ids=organism_ids,
-    #     swissprot_only=swissprot_only,
-    #     max_sequence_evidence_code=max_sequence_evidence_code,
-    #     additional_proteins=additional_proteins,
-    #     remove_proteins_without_gene_names=remove_proteins_without_gene_names,
-    # )
-
-    # # Get GO annotations from subset of transmembrane transporter go terms
-    # df_uniprot_goa = get_go_annotations_subset(
-    #     datasets_path=datasets_path,
-    #     root_go_term="transmembrane transporter activity",
-    #     inner_go_relations={"is_a"},
-    #     namespaces_keep={"molecular_function"},
-    #     proteins_subset=set(df_sequences.index),
-    #     go_protein_qualifiers_filter_set={"enables"},
-    #     annotations_evidence_codes_remove={"IEA"} if exclude_iea_go_terms else None,
-    # )
-    # Filter sequences for those with transporter go annotations
-    # df_sequences = df_sequences[df_sequences.index.isin(df_uniprot_goa.Uniprot)]
-
     return df_sequences, df_uniprot_goa
 
 
