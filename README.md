@@ -4,16 +4,17 @@
 
 ### Requirements
 
-Linux, miniconda
+- Linux (tested on Ubuntu 22.04 LTS)
+- [miniforge](https://github.com/conda-forge/miniforge)
 
-### create environment
+### Create environment
 
 ```bash
-mamba env create -f environment.yml
+conda env create -f environment.yml
 conda activate subpred_deeplearning
 ```
 
-### install code into environment
+### Install code into environment
 
 ```bash
 pip install -e .
