@@ -57,7 +57,7 @@ Link to raw data is provided above.
 
 All except Uniref updated on 11.05.2025
 
-### download go annotations
+### Download go annotations
 
 ```bash
 ./preprocessing/download_goa.sh
@@ -65,7 +65,7 @@ All except Uniref updated on 11.05.2025
 
 GOA UniProt (version 226), released on 06 May, 2025 and assembled using the publicly released data available in the source databases on 28 April, 2025.
 
-### download uniprot data (conda env must be active)
+### Download uniprot data (conda env must be active)
 
 ```bash
 ./preprocessing/download_uniprot.sh
@@ -73,7 +73,7 @@ GOA UniProt (version 226), released on 06 May, 2025 and assembled using the publ
 
 Uniprot Version 2025_02 released on 23.04.2025
 
-### download go ontology
+### Download go ontology
 
 ```bash
 ./preprocessing/download_go.sh
@@ -81,7 +81,7 @@ Uniprot Version 2025_02 released on 23.04.2025
 
 GO version 2025-03-16
 
-### download uniref, create blast databases (conda env must be active)
+### Download uniref, create blast databases (conda env must be active)
 
 ```bash
 ./preprocessing/download_uniref.sh
