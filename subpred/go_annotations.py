@@ -123,7 +123,7 @@ def __get_go_annotations(
 def __add_ancestors(df_uniprot_goa, graph_go):
     df_uniprot_goa["go_id_ancestor"] = df_uniprot_goa.go_id.map(
         lambda go_id: {go_id} | set(nx.descendants(graph_go, go_id))
-    )  # TODO this is very slow for larger graphs. multithreading did not improve running time by much, maybe try nx-cugraph or nx-parallel
+    )  # TODO this is very slow for larger graphs. multithreading did not improve running time by much, maybe try nx-cugraph
 
     df_uniprot_goa = df_uniprot_goa.explode("go_id_ancestor")
     df_uniprot_goa = df_uniprot_goa.reset_index(drop=True)
