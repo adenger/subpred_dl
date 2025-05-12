@@ -1,3 +1,6 @@
+"""
+@author: adenger
+"""
 def read_fasta(fasta_file_name):
     fasta_data = []
     current_sequence = ""

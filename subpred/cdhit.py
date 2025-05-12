@@ -1,3 +1,6 @@
+"""
+@author: adenger
+"""
 from subpred.fasta import read_fasta, write_fasta
 import tempfile
 import subprocess

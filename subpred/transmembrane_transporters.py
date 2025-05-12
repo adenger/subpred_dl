@@ -1,3 +1,6 @@
+"""
+@author: adenger
+"""
 from subpred.protein_dataset import get_sequence_dataset
 from subpred.go_annotations import get_go_annotations_subset
 from subpred.cdhit import cd_hit

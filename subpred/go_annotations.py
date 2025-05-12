@@ -1,3 +1,6 @@
+"""
+@author: adenger
+"""
 from subpred.util import load_data
 import networkx as nx
 import pandas as pd
