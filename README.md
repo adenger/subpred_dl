@@ -5,6 +5,8 @@
 mamba env create -f environment.yml
 conda activate subpred_deeplearning
 
+pip install -e .
+
 ## download go annotations
 
 ./preprocessing/download_goa.sh
