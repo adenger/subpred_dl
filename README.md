@@ -8,12 +8,16 @@ Linux, miniconda
 
 ### create environment
 
+```bash
 mamba env create -f environment.yml
 conda activate subpred_deeplearning
+```
 
 ### install code into environment
 
+```bash
 pip install -e .
+```
 
 ## Recreating results from manuscript
 
@@ -29,17 +33,18 @@ The raw data can be downloaded here:
 
 data/raw (..GB)
 
-Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project)
+Alternatively, a link to pre-processed data is provided above.
+
+Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025.
 
 TODO place Uniref2022 in raw data folder.
 
 The preprocessing of raw data can be carried out manually via
 
+```bash
 ./preprocessing/create_blastdbs.sh
-
 ./preprocessing/create_datasets.py
-
-Alternatively, a link to pre-processed data is provided above.
+```
 
 ## Download/update and process raw data
 
@@ -53,25 +58,33 @@ All except Uniref updated on 11.05.2025
 
 ### download go annotations
 
+```bash
 ./preprocessing/download_goa.sh
+```
 
 GOA UniProt (version 226), released on 06 May, 2025 and assembled using the publicly released data available in the source databases on 28 April, 2025.
 
 ### download uniprot data (conda env must be active)
 
+```bash
 ./preprocessing/download_uniprot.sh
+```
 
 Uniprot Version 2025_02 released on 23.04.2025
 
 ### download go ontology
 
+```bash
 ./preprocessing/download_go.sh
+```
 
 GO version 2025-03-16
 
 ### download uniref, create blast databases (conda env must be active)
 
+```bash
 ./preprocessing/download_uniref.sh
+```
 
 Uniref version 2022_1
 
