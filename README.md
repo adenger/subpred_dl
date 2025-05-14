@@ -6,6 +6,9 @@
 
 - Linux (tested on Ubuntu 22.04 LTS)
 - [miniforge](https://github.com/conda-forge/miniforge)
+- At least 64GB memory
+- Up to 500GB disk storage
+- Everything runs on the CPU, no GPU needed TODO ?
 
 ### Create environment
 
@@ -26,7 +29,7 @@ Links to the pre-processed datasets used in the study are provided here:
 
 data/datasets (..GB)
 
-To re-create the results from pre-processed data, only the latter archive is needed. 
+To re-create the manuscript results from pre-processed data, only this archive is needed.
 
 ## Recreate pre-processing
 
@@ -34,13 +37,13 @@ The raw data can be downloaded here:
 
 data/raw (..GB)
 
-Alternatively, a link to pre-processed data is provided above.
-
 Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025.
 
 TODO place Uniref2022 in raw data folder.
 
-The preprocessing of raw data can be carried out manually via
+The preprocessing of raw data can then be carried out manually via:
+
+TODO turn notebook into py
 
 ```bash
 ./preprocessing/create_blastdbs.sh
@@ -64,6 +67,12 @@ All except Uniref updated on 11.05.2025
 ```
 
 GOA UniProt (version 226), released on 06 May, 2025 and assembled using the publicly released data available in the source databases on 28 April, 2025.
+
+### Download AlphafoldDB PDB files for model organisms
+
+```bash
+./preprocessing/download_alphafolddb.sh
+```
 
 ### Download uniprot data (conda env must be active)
 
