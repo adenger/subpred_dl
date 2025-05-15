@@ -31,6 +31,8 @@ AMINO_ACIDS = [
     "Y",
 ]
 
+# 3di: ACDEFGHIKLMNPQRSTVWYX
+
 
 def __kmer_composition(sequence: str, k: int, kmers_dict: dict) -> pd.Series:
     counter = Counter(kmers_dict)

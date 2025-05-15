@@ -47,7 +47,7 @@ TODO turn notebook into py
 
 ```bash
 ./preprocessing/create_blastdbs.sh
-./preprocessing/create_3di_fasta.sh
+./preprocessing/create_3Di_fasta.sh
 ./preprocessing/create_datasets.py
 ```
 
