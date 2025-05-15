@@ -47,6 +47,7 @@ TODO turn notebook into py
 
 ```bash
 ./preprocessing/create_blastdbs.sh
+./preprocessing/create_3di_fasta.sh
 ./preprocessing/create_datasets.py
 ```
 
@@ -73,6 +74,10 @@ GOA UniProt (version 226), released on 06 May, 2025 and assembled using the publ
 ```bash
 ./preprocessing/download_alphafolddb.sh
 ```
+
+Version 4 from 2022, downloaded on 15.05.2025
+
+Additional tar files from alphafolddb (https://www.alphafold.ebi.ac.uk/download) can be added to the script, to include more organisms. They will automatically be pre-processed.
 
 ### Download uniprot data (conda env must be active)
 

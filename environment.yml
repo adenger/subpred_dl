@@ -32,6 +32,7 @@ dependencies:
   - ipywidgets
   - mini3di
   - biopython
+  - bioconda::foldseek
   # - conda-forge::yellowbrick
   # - conda-forge::imbalanced-learn
   # - flake8
