@@ -189,4 +189,6 @@ data/datasets/pssm/pssm_uniref*/*.pssm
 data/datasets/pssm/pssm_uniref*/*.fasta
 data/datasets/*.*pickle
 data/datasets/proteins_nonstandard_aminoacids.txt
+data/datasets/embeddings/*.npy
+
 data/data_backup_subpred_dl_170525.tar
