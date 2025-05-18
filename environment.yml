@@ -10,6 +10,7 @@ dependencies:
   - scikit-learn
   - scipy
   - black
+  - black-jupyter
   - ipykernel
   - joblib
   - matplotlib
