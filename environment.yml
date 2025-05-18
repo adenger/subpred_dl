@@ -25,6 +25,7 @@ dependencies:
   - keras
   - tensorflow
   - pytorch
+  - nvidia::cuda
   - transformers
   - sentencepiece
   - protobuf

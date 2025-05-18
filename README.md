@@ -4,11 +4,13 @@
 
 ### Requirements
 
-- Linux (tested on Ubuntu 22.04 LTS)
+- Linux (tested on Ubuntu 24.04 LTS)
 - [miniforge](https://github.com/conda-forge/miniforge)
 - At least 64GB memory
 - Up to 500GB disk storage
-- Everything runs on the CPU, no GPU needed TODO ?
+- GPU compatible with CUDA Toolkit 12.6
+
+TODO export exact env
 
 ### Create environment
 
