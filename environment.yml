@@ -20,6 +20,7 @@ dependencies:
   - bioconda::blast
   - openpyxl
   - ca-certificates
+  - pigz
   - certifi
   - openssl
   - obonet
