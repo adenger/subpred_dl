@@ -10,7 +10,7 @@ from sklearn.preprocessing import scale
 
 def calculate_features(
     series_sequences: pd.Series,
-    standardize_samples: bool = True,  # independent standardization with z-score derived from sample itself
+    standardize_samples: bool = False,
     pssm_folder: str = "../data/datasets/pssm/",
     blastdb_folder: str = "../data/datasets/blastdb/",
     verbosity_pssm:int=1
