@@ -85,6 +85,7 @@ def get_nlp_features(
     half_precision: bool = True,
     cache_folder: Path = Path("../data/datasets/embeddings/"),
 ):
+    # supports caching of results for faster loading
     # sequences: index uniprot accession, value sequence,
     #            lowercase for 3Di, uppercase for amino acid, only 20 AAs allowed
     # model: one of protT5, prostT5, TODO more?
@@ -128,5 +129,7 @@ def get_nlp_features(
     df_embeddings.columns = [
         f"{feature_name}_{dim_count}" for dim_count in range(df_embeddings.shape[1])
     ]
+    # prevent overflow warnings during printing, automatically select the best type
+    df_embeddings = df_embeddings.convert_dtypes(convert_floating=True)
 
     return df_embeddings
