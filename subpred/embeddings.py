@@ -123,7 +123,7 @@ def get_nlp_features(
 
         del embeddings_res
 
-    torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
     embeddings = np.array([np.load(x) for x in embedding_file_paths.values])
     df_embeddings = pd.DataFrame(data=embeddings, index=embedding_file_paths.index)
     df_embeddings.columns = [
