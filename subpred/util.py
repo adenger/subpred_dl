@@ -1,6 +1,7 @@
 """
 @author: adenger
 """
+
 # import os
 from pathlib import Path
 import pandas as pd
@@ -8,6 +9,7 @@ import networkx as nx
 import pickle
 
 # central methods for loading and saving pickles, since different data structures need different methods for that.
+
 
 def save_data(
     dataset: pd.DataFrame | nx.Graph,
@@ -47,6 +49,22 @@ def load_data(dataset_name: str, folder_path: str = "../data/datasets", **kwargs
             case "gpickle":
                 with open(file_path, "rb") as pickle_file:
                     return pickle.load(pickle_file)
+
+
+def save_results(
+    dataset: pd.DataFrame | nx.Graph,
+    dataset_name: str,
+    folder_path: str = "../data/results",
+    method: str = "auto",
+    **kwargs,
+):
+    save_data(
+        dataset=dataset,
+        dataset_name=dataset_name,
+        folder_path=folder_path,
+        method=method,
+        **kwargs,
+    )
 
 
 # import numpy as np
