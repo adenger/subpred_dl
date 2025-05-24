@@ -19,6 +19,8 @@ conda env create -f environment.yml
 conda activate subpred_deeplearning
 ```
 
+At the moment, the DNN notebooks need a different envirnoment where tensorflow-cpu is installed, as there is an issue with the current Nvidia GPU generation and stable version of TF. Once the stable version of TF is officially compatible, this will be changed to run on the GPU. The instructions to build the second environment are in the DNN notebook. The SVM notebook needs to be executed first to generate the feature data (and some of the feature algorithms use CUDA).
+
 ### Install code into environment
 
 ```bash
