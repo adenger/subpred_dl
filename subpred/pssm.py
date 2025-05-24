@@ -58,9 +58,11 @@ def __process_pssm_file(pssm_file_name, sequence: str):
             amino_acid_to_sum_vector[amino_acid] = sum_vector
 
         # Can happen for sequence conflicts, like in Q91Y77 position 5
-        assert (
-            sequence_pssm_file == sequence
-        ), f"Sequence from PSSM file {pssm_file_name} did not match input sequence:\n{sequence_pssm_file}\n{sequence}"
+        # assert (
+        #     sequence_pssm_file == sequence
+        # ), f"Sequence from PSSM file {pssm_file_name} did not match input sequence:\n{sequence_pssm_file}\n{sequence}"
+        if sequence_pssm_file != sequence:
+            print(f"warning: Sequence from PSSM file {pssm_file_name} did not match input sequence:\n{sequence_pssm_file}\n{sequence}")
 
         sum_amino_acids = ""
         pssm = []
