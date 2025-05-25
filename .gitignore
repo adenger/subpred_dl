@@ -192,3 +192,8 @@ data/datasets/proteins_nonstandard_aminoacids.txt
 data/datasets/embeddings/*.npy
 
 data/data_backup_subpred_dl_170525.tar
+
+data/results/*.pickle
+data/results/*.png
+
+data/tmp/*.pickle
