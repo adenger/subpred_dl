@@ -44,7 +44,9 @@ def get_classification_subset(dataset_full, go_terms: list):
     assert (
         not df_uniprot_goa.index.duplicated().any()
     ), "Some proteins are annotated with two or more of the GO terms simultaneously"
-    df_sequences = df_sequences.loc[df_uniprot_goa.index]
+    df_sequences = df_sequences[
+        df_sequences.index.isin(df_uniprot_goa.index)
+    ]
     return df_sequences, df_uniprot_goa
 
 
