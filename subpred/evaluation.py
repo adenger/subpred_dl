@@ -56,6 +56,8 @@ def nested_crossval_svm(
     outer_cv: int = 5,
     inner_cv: int = 5,
     repeats: int = 10,
+    n_jobs_inner: int = 1,
+    n_jobs_outer: int = -1,
 ):
     print(f"=== {test_name} ===")
     model = make_pipeline(
@@ -79,11 +81,11 @@ def nested_crossval_svm(
         param_grid=param_grid,
         scoring="balanced_accuracy",
         cv=StratifiedKFold(inner_cv),
-        n_jobs=-1,
+        n_jobs=n_jobs_inner,
     )
 
     # Nested loop (sound results):
-    gridsearch.n_jobs = 1
+    # gridsearch.n_jobs = 1
     nested_crossval_results = cross_val_score(
         gridsearch,
         X,
@@ -92,7 +94,7 @@ def nested_crossval_svm(
             n_splits=outer_cv, n_repeats=repeats, random_state=0
         ),
         scoring="balanced_accuracy",
-        n_jobs=-1,
+        n_jobs=n_jobs_outer,
     )
     print(
         f"Nested crossvalidation: {nested_crossval_results.mean():.2f}+-{nested_crossval_results.std():.2f}"
@@ -101,22 +103,32 @@ def nested_crossval_svm(
 
 
 def get_svm_results(
-    ml_datasets: list, output_folder: str, test_name: str, recalculate: bool = True
+    ml_datasets: list,
+    output_folder: str,
+    test_name: str,
+    recalculate: bool = True,
+    outer_cv: int = 5,
+    inner_cv: int = 5,
+    repeats: int = 10,
+    n_jobs_inner: int = 1,
+    n_jobs_outer: int = -1,
 ):
 
     if not recalculate and Path(output_folder + test_name + ".pickle").exists():
         df_results_long = load_data(test_name, folder_path=output_folder)
     else:
-        # takes about 20 min
 
-        # variancethreshold removes features, then selectkbest complains that more features are selected than available
-        # because max_features = min(len(feature_names), 200).
-        # in this case, selectkbest simply returns all remaining features, so nothing to worry about.
-        # using variancethreshold to determine max_features could be seen as information sharing, therefore we avoid that
         results_rbf_svm = [
             (
                 ml_dataset[0],
-                nested_crossval_svm(*ml_dataset, outer_cv=5, inner_cv=5, repeats=10),
+                nested_crossval_svm(
+                    *ml_dataset,
+                    outer_cv=outer_cv,
+                    inner_cv=inner_cv,
+                    repeats=repeats,
+                    n_jobs_outer=n_jobs_outer,
+                    n_jobs_inner=n_jobs_inner,
+                ),
             )
             for ml_dataset in ml_datasets
         ]
@@ -165,6 +177,7 @@ def plot_results_long(
     plt.yticks(np.arange(0, 1.1, 0.1))
     plt.savefig(output_folder_path + test_name, bbox_inches="tight", dpi=300)
     return df_results_long_stats
+
 
 # TODO This whole cell as function
 

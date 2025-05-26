@@ -45,7 +45,7 @@ def get_ml_dataset(df_features: pd.DataFrame, series_labels: pd.Series):
     return X, y, sample_names, feature_names
 
 
-def get_features(dataset_full: tuple):
+def get_features(dataset_full: tuple, include_pssm_features: bool = True):
     # dataset_full: generated with protein_go_datasets.py
     # Can take a long time if cache is empty
     df_sequences, df_uniprot_goa = dataset_full[0].copy(), dataset_full[1].copy()
@@ -59,96 +59,23 @@ def get_features(dataset_full: tuple):
         dataset_name="3Di_alphafold4",
         folder_path="../data/datasets",
     )
+
     # Are there as many 3Di sequences as AA sequences? TODO If yes, maybe take intersection
     assert len(sequences_3Di) == len(series_sequences)
+    assert (sequences_3Di.index == series_sequences.index).all()
 
     # original sequences features
     df_aac = calculate_comp(series_sequences, k=1, alphabet=AMINO_ACIDS)
     df_paac = calculate_comp(series_sequences, k=2, alphabet=AMINO_ACIDS)
     df_kmer3 = calculate_comp(series_sequences, k=3, alphabet=AMINO_ACIDS)
 
-    pssm_folder = "../data/datasets/pssm/"
-    blastdb_folder = "../data/datasets/blastdb/"
-    verbosity_pssm = 1  # only print if no pssm found
-    df_pssm_50_1 = calculate_pssm_feature(
-        series_sequences,
-        tmp_folder=pssm_folder + "pssm_uniref50_1it",
-        blast_db=blastdb_folder + "uniref50/uniref50.fasta",
-        iterations=1,
-        psiblast_threads=-1,
-        verbosity=verbosity_pssm,
-        feature_name="PSSM_50_1",
-    )
-    df_pssm_50_3 = calculate_pssm_feature(
-        series_sequences,
-        tmp_folder=pssm_folder + "pssm_uniref50_3it",
-        blast_db=blastdb_folder + "uniref50/uniref50.fasta",
-        iterations=3,
-        psiblast_threads=-1,
-        verbosity=verbosity_pssm,
-        feature_name="PSSM_50_3",
-    )
-    df_pssm_90_1 = calculate_pssm_feature(
-        series_sequences,
-        tmp_folder=pssm_folder + "pssm_uniref90_3it",
-        blast_db=blastdb_folder + "uniref90/uniref90.fasta",
-        iterations=1,
-        psiblast_threads=-1,
-        verbosity=verbosity_pssm,
-        feature_name="PSSM_90_1",
-    )
-    df_pssm_90_3 = calculate_pssm_feature(
-        series_sequences,
-        tmp_folder=pssm_folder + "pssm_uniref90_3it",
-        blast_db=blastdb_folder + "uniref90/uniref90.fasta",
-        iterations=3,
-        psiblast_threads=-1,
-        verbosity=verbosity_pssm,
-        feature_name="PSSM_90_3",
-    )
-    df_pssm_meta = pd.concat(
-        [df_pssm_50_1, df_pssm_50_3, df_pssm_90_1, df_pssm_90_3], axis=1
-    )
-
-    # df_meta = calculate_features(series_sequences=series_sequences, standardize_samples=False)
-    # df_meta_std = calculate_features(series_sequences=series_sequences, standardize_samples=True)
-    # Meta feature from previous study
-    df_meta = pd.concat(
-        [
-            df_aac,
-            df_paac,
-            df_pssm_50_1,
-            df_pssm_50_3,
-            df_pssm_90_1,
-            df_pssm_90_3,
-        ],
-        axis=1,
-    )
-    # Meta fingerprint from previous study
-    df_meta_std = pd.concat(
-        [
-            pd.DataFrame(
-                data=scale(feature.copy(), axis=1),
-                index=feature.index,
-                columns=feature.columns,
-            )
-            for feature in [
-                df_aac,
-                df_paac,
-                df_pssm_50_1,
-                df_pssm_50_3,
-                df_pssm_90_1,
-                df_pssm_90_3,
-            ]
-        ],
-        axis=1,
-    )
-
     df_3Di_AAC = calculate_comp(sequences=sequences_3Di, k=1, alphabet=ALPHABET_3DI)
     df_3Di_PAAC = calculate_comp(sequences=sequences_3Di, k=2, alphabet=ALPHABET_3DI)
     df_3Di_KMER3 = calculate_comp(sequences=sequences_3Di, k=3, alphabet=ALPHABET_3DI)
 
     # combining aa and 3di kmers
+    print(df_3Di_AAC.index)
+    print(df_aac.index)
     df_KMER1_COMBINED = pd.concat([df_3Di_AAC, df_aac], axis=1)
     df_KMER2_COMBINED = pd.concat([df_3Di_PAAC, df_paac], axis=1)
     df_KMER3_COMBINED = pd.concat([df_3Di_KMER3, df_kmer3], axis=1)
@@ -186,13 +113,13 @@ def get_features(dataset_full: tuple):
         ("AAC", df_aac),
         ("PAAC", df_paac),
         ("AA_KMER3", df_kmer3),
-        ("PSSM_50_1", df_pssm_50_1),
-        ("PSSM_50_3", df_pssm_50_3),
-        ("PSSM_90_1", df_pssm_90_1),
-        ("PSSM_90_3", df_pssm_90_3),
-        ("PSSM_META", df_pssm_meta),
-        ("META", df_meta),
-        ("META_STD", df_meta_std),
+        # ("PSSM_50_1", df_pssm_50_1),
+        # ("PSSM_50_3", df_pssm_50_3),
+        # ("PSSM_90_1", df_pssm_90_1),
+        # ("PSSM_90_3", df_pssm_90_3),
+        # ("PSSM_META", df_pssm_meta),
+        # ("META", df_meta),
+        # ("META_STD", df_meta_std),
         ("3Di_COMP", df_3Di_AAC),
         ("3Di_KMER2", df_3Di_PAAC),
         ("3Di_KMER3", df_3Di_KMER3),
@@ -203,6 +130,109 @@ def get_features(dataset_full: tuple):
         ("PROSTT5_AA", df_embeddings_prostt5_AA),
         ("PROSTT5_3DI", df_embeddings_prott5_3Di),
     ]
+
+    if include_pssm_features:
+        pssm_folder = "../data/datasets/pssm/"
+        blastdb_folder = "../data/datasets/blastdb/"
+        verbosity_pssm = 1  # only print if no pssm found
+        df_pssm_50_1 = calculate_pssm_feature(
+            series_sequences,
+            tmp_folder=pssm_folder + "pssm_uniref50_1it",
+            blast_db=blastdb_folder + "uniref50/uniref50.fasta",
+            iterations=1,
+            psiblast_threads=-1,
+            verbosity=verbosity_pssm,
+            feature_name="PSSM_50_1",
+        )
+        df_pssm_50_3 = calculate_pssm_feature(
+            series_sequences,
+            tmp_folder=pssm_folder + "pssm_uniref50_3it",
+            blast_db=blastdb_folder + "uniref50/uniref50.fasta",
+            iterations=3,
+            psiblast_threads=-1,
+            verbosity=verbosity_pssm,
+            feature_name="PSSM_50_3",
+        )
+        df_pssm_90_1 = calculate_pssm_feature(
+            series_sequences,
+            tmp_folder=pssm_folder + "pssm_uniref90_3it",
+            blast_db=blastdb_folder + "uniref90/uniref90.fasta",
+            iterations=1,
+            psiblast_threads=-1,
+            verbosity=verbosity_pssm,
+            feature_name="PSSM_90_1",
+        )
+        df_pssm_90_3 = calculate_pssm_feature(
+            series_sequences,
+            tmp_folder=pssm_folder + "pssm_uniref90_3it",
+            blast_db=blastdb_folder + "uniref90/uniref90.fasta",
+            iterations=3,
+            psiblast_threads=-1,
+            verbosity=verbosity_pssm,
+            feature_name="PSSM_90_3",
+        )
+        df_pssm_meta = pd.concat(
+            [df_pssm_50_1, df_pssm_50_3, df_pssm_90_1, df_pssm_90_3], axis=1
+        )
+
+        # df_meta = calculate_features(series_sequences=series_sequences, standardize_samples=False)
+        # df_meta_std = calculate_features(series_sequences=series_sequences, standardize_samples=True)
+        # Meta feature from previous study
+        df_meta = pd.concat(
+            [
+                df_aac,
+                df_paac,
+                df_pssm_50_1,
+                df_pssm_50_3,
+                df_pssm_90_1,
+                df_pssm_90_3,
+            ],
+            axis=1,
+        )
+        # Meta fingerprint from previous study
+        df_meta_std = pd.concat(
+            [
+                pd.DataFrame(
+                    data=scale(feature.copy(), axis=1),
+                    index=feature.index,
+                    columns=feature.columns,
+                )
+                for feature in [
+                    df_aac,
+                    df_paac,
+                    df_pssm_50_1,
+                    df_pssm_50_3,
+                    df_pssm_90_1,
+                    df_pssm_90_3,
+                ]
+            ],
+            axis=1,
+        )
+
+        features_list.extend(
+            [
+                # ("DUMMY", df_dummy_feature),
+                # ("AAC", df_aac),
+                # ("PAAC", df_paac),
+                # ("AA_KMER3", df_kmer3),
+                ("PSSM_50_1", df_pssm_50_1),
+                ("PSSM_50_3", df_pssm_50_3),
+                ("PSSM_90_1", df_pssm_90_1),
+                ("PSSM_90_3", df_pssm_90_3),
+                ("PSSM_META", df_pssm_meta),
+                ("META", df_meta),
+                ("META_STD", df_meta_std),
+                # ("3Di_COMP", df_3Di_AAC),
+                # ("3Di_KMER2", df_3Di_PAAC),
+                # ("3Di_KMER3", df_3Di_KMER3),
+                # ("COMB_KMER1", df_KMER1_COMBINED),
+                # ("COMB_KMER2", df_KMER2_COMBINED),
+                # ("COMB_KMER3", df_KMER3_COMBINED),
+                # ("PROTT5_AA", df_embeddings_prott5_AA),
+                # ("PROSTT5_AA", df_embeddings_prostt5_AA),
+                # ("PROSTT5_3DI", df_embeddings_prott5_3Di),
+            ]
+        )
     features_list = [
         (feature_name, df_feature.loc[series_accessions])
         for feature_name, df_feature in features_list

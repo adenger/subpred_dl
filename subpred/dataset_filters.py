@@ -60,10 +60,12 @@ def get_proteome_classification_subset(dataset_full, go_term: str):
         df_uniprot_goa.go_term_ancestor == go_term
     ].Uniprot.unique()
     background_proteins = df_uniprot_goa[
-        ~df_uniprot_goa.go_term_ancestor.isin(go_term_proteins)
+        ~df_uniprot_goa.Uniprot.isin(go_term_proteins) 
     ].Uniprot.unique()
     go_term_proteins_labels = [go_term] * len(go_term_proteins)
-    background_proteins_labels = ["NOT|" + go_term] * len(background_proteins)
+    # labelencoder sorts lexicographically. ! makes sure that the negative class has lower lex. value, 
+    # so it is encoded with 0, as no GO term starts with "!"
+    background_proteins_labels = ["!!NOT|" + go_term] * len(background_proteins)
 
     df_task = pd.concat(
         [
@@ -80,7 +82,9 @@ def get_proteome_classification_subset(dataset_full, go_term: str):
         ],
         axis=0,
     )
-
+    assert not df_task.index.duplicated().any()
+    # the protein sets are mutually exclusive
+    # df_task = df_task[~df_task.index.duplicated(keep='first')]
     df_task.index = df_task.index.rename("Uniprot")
     df_sequences = df_sequences.loc[df_task.index]
     return df_sequences, df_task
