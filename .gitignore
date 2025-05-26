@@ -198,3 +198,4 @@ data/results/*.png
 
 data/tmp/*.pickle
 data/tmp_data/ml_data_at_sugaramino.pickle
+data/tmp_data/ml_data_human_sugaramino.pickle
