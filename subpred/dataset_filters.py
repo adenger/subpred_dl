@@ -19,10 +19,11 @@ def cluster_sequences(dataset_full, identity_threshold: int):
     return df_sequences, df_uniprot_goa
 
 
-def filter_no_3Di_available(dataset_full):
+def filter_no_3Di_available(dataset_full, remove_unequal_len:bool=True):
     # dataset_full: tuple of df_sequences, df_uniprot_goa created with protein_go_datasets.py
+    # remove_unequal_len: remove proteins where lengths of 3Di and AA sequence do not match
     # function to remove proteins that don't have all features available
-    accessions_3Di_available = get_3Di_sequences(dataset_full[0].index).index
+    accessions_3Di_available = get_3Di_sequences(dataset_full[0].index, remove_unequal_len=remove_unequal_len).index
     dataset_full_filtered = (
         dataset_full[0][dataset_full[0].index.isin(accessions_3Di_available)].copy(),
         dataset_full[1][dataset_full[1].index.isin(accessions_3Di_available)].copy(),
