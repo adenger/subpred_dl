@@ -58,6 +58,8 @@ def nested_crossval_svm(
     repeats: int = 10,
     n_jobs_inner: int = 1,
     n_jobs_outer: int = -1,
+    scoring_inner: str = "balanced_accuracy",
+    scoring_outer: str = "balanced_accuracy",
 ):
     print(f"=== {test_name} ===")
     model = make_pipeline(
@@ -79,7 +81,7 @@ def nested_crossval_svm(
     gridsearch = GridSearchCV(
         estimator=model,
         param_grid=param_grid,
-        scoring="balanced_accuracy",
+        scoring=scoring_inner,
         cv=StratifiedKFold(inner_cv),
         n_jobs=n_jobs_inner,
     )
@@ -93,7 +95,7 @@ def nested_crossval_svm(
         cv=RepeatedStratifiedKFold(
             n_splits=outer_cv, n_repeats=repeats, random_state=0
         ),
-        scoring="balanced_accuracy",
+        scoring=scoring_outer,
         n_jobs=n_jobs_outer,
     )
     print(
@@ -107,27 +109,20 @@ def get_svm_results(
     output_folder: str,
     test_name: str,
     recalculate: bool = True,
-    outer_cv: int = 5,
-    inner_cv: int = 5,
-    repeats: int = 10,
-    n_jobs_inner: int = 1,
-    n_jobs_outer: int = -1,
+    **kwargs  # for nested_crossval
 ):
-
+    # wrapper method for caching, and preparing long-form results for plot
+    # performs nested crossval for each feature in ml_datasets
     if not recalculate and Path(output_folder + test_name + ".pickle").exists():
         df_results_long = load_data(test_name, folder_path=output_folder)
     else:
 
         results_rbf_svm = [
             (
-                ml_dataset[0],
+                ml_dataset[0],  
                 nested_crossval_svm(
                     *ml_dataset,
-                    outer_cv=outer_cv,
-                    inner_cv=inner_cv,
-                    repeats=repeats,
-                    n_jobs_outer=n_jobs_outer,
-                    n_jobs_inner=n_jobs_inner,
+                    **kwargs
                 ),
             )
             for ml_dataset in ml_datasets
@@ -138,8 +133,13 @@ def get_svm_results(
             for test_result in test_results:
                 results_long.append((feature_name, test_result))
 
+        if "scoring_outer" in kwargs:
+            score_name = kwargs["scoring_outer"].replace("_"," ").title()
+        else:
+            score_name = "Score"
+
         df_results_long = pd.DataFrame.from_records(
-            results_long, columns=["Feature Name", "Balanced Accuracy"]
+            results_long, columns=["Feature Name", score_name]
         )
 
         save_data(df_results_long, test_name, folder_path=output_folder)
@@ -150,24 +150,27 @@ def plot_results_long(
     df_results_long: pd.DataFrame, output_folder_path: str, test_name: str
 ):
     plt.figure(figsize=(10, 5), dpi=500)
+    score_name = df_results_long.columns[1]
+    print(f"creating plot for score {score_name}")
     df_results_long_stats = pd.concat(
         [
-            df_results_long.groupby("Feature Name")["Balanced Accuracy"]
-            .median()  # TODO mean?
-            .rename("median_val"),
-            df_results_long.groupby("Feature Name")["Balanced Accuracy"]
+            df_results_long.groupby("Feature Name")[score_name]
+            .mean()  # TODO mean?
+            .rename("mean_val"),
+            df_results_long.groupby("Feature Name")[score_name]
             .std()
             .rename("std_val"),
         ],
         axis=1,
+        verify_integrity=True
     )
     df_results_long_stats = df_results_long_stats.sort_values(
-        by=["median_val", "std_val"], ascending=[True, False]
+        by=["mean_val", "std_val"], ascending=[True, False]
     )
     sns.boxplot(
         df_results_long,
         x="Feature Name",
-        y="Balanced Accuracy",
+        y=score_name,
         order=df_results_long_stats.index,
     )
     df_results_long
