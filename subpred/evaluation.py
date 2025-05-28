@@ -5,7 +5,6 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
-import seaborn as sns
 from sklearn.svm import LinearSVC, SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest, VarianceThreshold, f_classif
@@ -13,6 +12,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import (
     GridSearchCV,
     cross_val_score,
+    cross_validate,
     RepeatedStratifiedKFold,
     StratifiedKFold,
 )
@@ -22,6 +22,7 @@ from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest
 from subpred.util import save_data, load_data
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 # Tested: gives same results but without error messages
@@ -88,7 +89,7 @@ def nested_crossval_svm(
 
     # Nested loop (sound results):
     # gridsearch.n_jobs = 1
-    nested_crossval_results = cross_val_score(
+    nested_crossval_results = cross_validate(
         gridsearch,
         X,
         y,
@@ -98,10 +99,17 @@ def nested_crossval_svm(
         scoring=scoring_outer,
         n_jobs=n_jobs_outer,
     )
-    print(
-        f"Nested crossvalidation: {nested_crossval_results.mean():.2f}+-{nested_crossval_results.std():.2f}"
-    )
-    return nested_crossval_results
+    if isinstance(scoring_outer, str):
+        cv_results = [(scoring_outer, nested_crossval_results["test_score"])]
+    else:  # list
+        cv_results = [
+            (metric_name, nested_crossval_results[f"test_{metric_name}"])
+            for metric_name in scoring_outer
+        ]
+
+    for score_name, scores in cv_results:
+        print(f"{score_name}: {scores.mean():.2f}+-{scores.std():.2f}")
+    return cv_results
 
 
 def get_svm_results(
@@ -109,7 +117,7 @@ def get_svm_results(
     output_folder: str,
     test_name: str,
     recalculate: bool = True,
-    **kwargs  # for nested_crossval
+    **kwargs,  # for nested_crossval
 ):
     # wrapper method for caching, and preparing long-form results for plot
     # performs nested crossval for each feature in ml_datasets
@@ -119,67 +127,89 @@ def get_svm_results(
 
         results_rbf_svm = [
             (
-                ml_dataset[0],  
-                nested_crossval_svm(
-                    *ml_dataset,
-                    **kwargs
-                ),
+                ml_dataset[0],
+                nested_crossval_svm(*ml_dataset, **kwargs),
             )
             for ml_dataset in ml_datasets
         ]
 
         results_long = list()
         for feature_name, test_results in results_rbf_svm:
-            for test_result in test_results:
-                results_long.append((feature_name, test_result))
+            for metric_name, metric_scores in test_results:
+                for metric_score in metric_scores:
+                    results_long.append((feature_name, metric_name, metric_score))
 
-        if "scoring_outer" in kwargs:
-            score_name = kwargs["scoring_outer"].replace("_"," ").title()
-        else:
-            score_name = "Score"
+        # if "scoring_outer" in kwargs:
+        #     score_name = kwargs["scoring_outer"].replace("_"," ").title()
+        # else:
+        #     score_name = "Score"
 
         df_results_long = pd.DataFrame.from_records(
-            results_long, columns=["Feature Name", score_name]
+            results_long, columns=["Feature", "Metric", "Value"]
         )
 
         save_data(df_results_long, test_name, folder_path=output_folder)
     return df_results_long
 
 
-def plot_results_long(
-    df_results_long: pd.DataFrame, output_folder_path: str, test_name: str
-):
-    plt.figure(figsize=(10, 5), dpi=500)
-    score_name = df_results_long.columns[1]
-    print(f"creating plot for score {score_name}")
-    df_results_long_stats = pd.concat(
+def summarize_results_long(df_results_long: pd.DataFrame):
+    return pd.concat(
         [
-            df_results_long.groupby("Feature Name")[score_name]
-            .mean()  # TODO mean?
-            .rename("mean_val"),
-            df_results_long.groupby("Feature Name")[score_name]
+            df_results_long.groupby(["Feature", "Metric"])
+            .mean()
+            .rename(columns={"Value": "Mean"}),
+            df_results_long.groupby(["Feature", "Metric"])
+            .median()
+            .rename(columns={"Value": "Median"}),
+            df_results_long.groupby(["Feature", "Metric"])
             .std()
-            .rename("std_val"),
+            .rename(columns={"Value": "Sdev"}),
         ],
         axis=1,
-        verify_integrity=True
     )
-    df_results_long_stats = df_results_long_stats.sort_values(
-        by=["mean_val", "std_val"], ascending=[True, False]
+
+
+def plot_results_long(
+    df_results_long: pd.DataFrame,
+    output_folder_path: str,
+    test_name: str,
+    metrics_include: list = ["f1_macro", "balanced_accuracy"],
+):
+    plot_order = (
+        pd.concat(
+            [
+                df_results_long.groupby("Feature").Value.median().rename("median"),
+                df_results_long.groupby("Feature").Value.std().rename("std"),
+            ],
+            axis=1,
+        )
+        .sort_values(["median", "std"], ascending=[True, False])
+        .index
     )
+
+    df_results_long_plt = df_results_long[df_results_long.Metric.isin(metrics_include)]
+    df_results_long_plt = df_results_long_plt.assign(
+        Metric=df_results_long_plt.Metric.str.replace("_", " ").str.title()
+    )
+
+    multiple_metrics = len(metrics_include) > 1
+    if not multiple_metrics:
+        metric_name = metrics_include[0].replace("_", " ").title()
+        df_results_long_plt = df_results_long_plt.drop("Metric", axis=1).rename(
+            columns={"Value": metric_name}
+        )
     sns.boxplot(
-        df_results_long,
-        x="Feature Name",
-        y=score_name,
-        order=df_results_long_stats.index,
+        df_results_long_plt,
+        x="Feature",
+        y="Value" if multiple_metrics else metric_name,
+        hue="Metric" if multiple_metrics else None,
+        order=plot_order,
     )
-    df_results_long
     plt.xticks(rotation=90)
     plt.ylim((0, 1.05))
     plt.grid(True, alpha=0.5)
     plt.yticks(np.arange(0, 1.1, 0.1))
     plt.savefig(output_folder_path + test_name, bbox_inches="tight", dpi=300)
-    return df_results_long_stats
 
 
 # TODO This whole cell as function
