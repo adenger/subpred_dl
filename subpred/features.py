@@ -74,8 +74,6 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
     df_3Di_KMER3 = calculate_comp(sequences=sequences_3Di, k=3, alphabet=ALPHABET_3DI)
 
     # combining aa and 3di kmers
-    print(df_3Di_AAC.index)
-    print(df_aac.index)
     df_KMER1_COMBINED = pd.concat([df_3Di_AAC, df_aac], axis=1)
     df_KMER2_COMBINED = pd.concat([df_3Di_PAAC, df_paac], axis=1)
     df_KMER3_COMBINED = pd.concat([df_3Di_KMER3, df_kmer3], axis=1)
@@ -113,13 +111,6 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
         ("AAC", df_aac),
         ("PAAC", df_paac),
         ("AA_KMER3", df_kmer3),
-        # ("PSSM_50_1", df_pssm_50_1),
-        # ("PSSM_50_3", df_pssm_50_3),
-        # ("PSSM_90_1", df_pssm_90_1),
-        # ("PSSM_90_3", df_pssm_90_3),
-        # ("PSSM_META", df_pssm_meta),
-        # ("META", df_meta),
-        # ("META_STD", df_meta_std),
         ("3Di_COMP", df_3Di_AAC),
         ("3Di_KMER2", df_3Di_PAAC),
         ("3Di_KMER3", df_3Di_KMER3),
@@ -132,6 +123,8 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
     ]
 
     if include_pssm_features:
+        # PSSMs take very long time for large datasets
+        # therefore we exclude these features for proteome searching 
         pssm_folder = "../data/datasets/pssm/"
         blastdb_folder = "../data/datasets/blastdb/"
         verbosity_pssm = 1  # only print if no pssm found
@@ -211,10 +204,6 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
 
         features_list.extend(
             [
-                # ("DUMMY", df_dummy_feature),
-                # ("AAC", df_aac),
-                # ("PAAC", df_paac),
-                # ("AA_KMER3", df_kmer3),
                 ("PSSM_50_1", df_pssm_50_1),
                 ("PSSM_50_3", df_pssm_50_3),
                 ("PSSM_90_1", df_pssm_90_1),
@@ -222,17 +211,9 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
                 ("PSSM_META", df_pssm_meta),
                 ("META", df_meta),
                 ("META_STD", df_meta_std),
-                # ("3Di_COMP", df_3Di_AAC),
-                # ("3Di_KMER2", df_3Di_PAAC),
-                # ("3Di_KMER3", df_3Di_KMER3),
-                # ("COMB_KMER1", df_KMER1_COMBINED),
-                # ("COMB_KMER2", df_KMER2_COMBINED),
-                # ("COMB_KMER3", df_KMER3_COMBINED),
-                # ("PROTT5_AA", df_embeddings_prott5_AA),
-                # ("PROSTT5_AA", df_embeddings_prostt5_AA),
-                # ("PROSTT5_3DI", df_embeddings_prott5_3Di),
             ]
         )
+        
     features_list = [
         (feature_name, df_feature.loc[series_accessions])
         for feature_name, df_feature in features_list
