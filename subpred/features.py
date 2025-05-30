@@ -14,35 +14,49 @@ from subpred.embeddings import get_nlp_features
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import scale
+from subpred.mldataset import MLDataset
 
 
 def get_ml_datasets(features_list: list, series_labels: pd.Series):
-    # features_list: list of dataframes, where rows are samples and columns features
-    ml_datasets = [
-        (
-            feature_name,
-            *get_ml_dataset(df_features=df_features, series_labels=series_labels),
-        )
-        for feature_name, df_features in features_list
-    ]
-    return ml_datasets
+    label_encoder = LabelEncoder()  # sorts labels lexicographically
 
-
-def get_ml_dataset(df_features: pd.DataFrame, series_labels: pd.Series):
-    # df_features, series_labels from features.get_features
-    assert not series_labels.index.duplicated().any()
-    assert (df_features.index == series_labels.index).all()
-
-    sample_names = df_features.index.to_numpy()
-    feature_names = df_features.columns.to_numpy()
-
-    label_encoder = LabelEncoder()
-
-    X = df_features.loc[sample_names].to_numpy()
-    y_str = series_labels.loc[sample_names].to_numpy().ravel()
+    y_str = series_labels.to_numpy().ravel()
     y = label_encoder.fit_transform(y_str)
+    sample_names = series_labels.index
+    assert max(y) == 1, "More of fewer than two classes found"
+    for feature_name, df_feature in features_list:
+        assert (
+            df_feature.index == series_labels.index
+        ).all(), "Feature index does not match label index"
+        feature_names = df_feature.columns.to_numpy()
+        X = df_feature.to_numpy()
+        yield MLDataset(
+            name=feature_name,
+            X=X,
+            y=y,
+            feature_names=feature_names,
+            sample_names=sample_names,
+            label_encoder=label_encoder,
+        )
 
-    return X, y, sample_names, feature_names
+
+# def get_ml_dataset(
+#     df_features: pd.DataFrame, series_labels: pd.Series, label_encoder: LabelEncoder
+# ):
+#     # df_features, series_labels from features.get_features
+#     assert not series_labels.index.duplicated().any()
+#     assert (df_features.index == series_labels.index).all()
+
+#     sample_names = df_features.index.to_numpy()
+#     feature_names = df_features.columns.to_numpy()
+
+#     # label_encoder = LabelEncoder()
+
+#     X = df_features.loc[sample_names].to_numpy()
+#     y_str = series_labels.loc[sample_names].to_numpy().ravel()
+#     y = label_encoder.fit_transform(y_str)
+
+#     return X, y, sample_names, feature_names
 
 
 def get_features(dataset_full: tuple, include_pssm_features: bool = True):
@@ -124,7 +138,7 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
 
     if include_pssm_features:
         # PSSMs take very long time for large datasets
-        # therefore we exclude these features for proteome searching 
+        # therefore we exclude these features for proteome searching
         pssm_folder = "../data/datasets/pssm/"
         blastdb_folder = "../data/datasets/blastdb/"
         verbosity_pssm = 1  # only print if no pssm found
@@ -213,7 +227,7 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
                 ("META_STD", df_meta_std),
             ]
         )
-        
+
     features_list = [
         (feature_name, df_feature.loc[series_accessions])
         for feature_name, df_feature in features_list

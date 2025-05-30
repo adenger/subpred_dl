@@ -23,6 +23,7 @@ from sklearn.ensemble import IsolationForest
 from subpred.util import save_data, load_data
 import matplotlib.pyplot as plt
 import seaborn as sns
+from subpred.mldataset import MLDataset
 
 
 # Tested: gives same results but without error messages
@@ -49,25 +50,21 @@ class DynamicSelectKBest(BaseEstimator, TransformerMixin):
 
 
 def nested_crossval_svm(
-    test_name,
-    X,
-    y,
-    sample_names,
-    feature_names,
+    ml_dataset: MLDataset,
     outer_cv: int = 5,
     inner_cv: int = 5,
     repeats: int = 10,
     n_jobs_inner: int = 1,
     n_jobs_outer: int = -1,
     scoring_inner: str = "balanced_accuracy",
-    scoring_outer: str = "balanced_accuracy",
+    scoring_outer: dict = {"Balanced Accuracy": "balanced_accuracy"},
 ):
-    print(f"=== {test_name} ===")
+    print(f"=== {ml_dataset.name} ===")
     model = make_pipeline(
         VarianceThreshold(), StandardScaler(), DynamicSelectKBest(), SVC()
     )
 
-    max_features = min(len(feature_names), 200)
+    max_features = min(len(ml_dataset.feature_names), 200)
 
     param_grid = {
         "dynamicselectkbest__k": list(range(1, max_features, 1)),
@@ -91,21 +88,26 @@ def nested_crossval_svm(
     # gridsearch.n_jobs = 1
     nested_crossval_results = cross_validate(
         gridsearch,
-        X,
-        y,
+        ml_dataset.X,
+        ml_dataset.y,
         cv=RepeatedStratifiedKFold(
             n_splits=outer_cv, n_repeats=repeats, random_state=0
         ),
         scoring=scoring_outer,
         n_jobs=n_jobs_outer,
     )
-    if isinstance(scoring_outer, str):
-        cv_results = [(scoring_outer, nested_crossval_results["test_score"])]
-    else:  # list
-        cv_results = [
-            (metric_name, nested_crossval_results[f"test_{metric_name}"])
-            for metric_name in scoring_outer
-        ]
+    cv_results = [
+        (metric_name, nested_crossval_results[f"test_{metric_name}"])
+        for metric_name, _ in scoring_outer.items()
+    ]
+    # print(nested_crossval_results)
+    # if isinstance(scoring_outer, str):
+    #     cv_results = [(scoring_outer, nested_crossval_results["test_score"])]
+    # else:  # list
+    #     cv_results = [
+    #         (metric_name, nested_crossval_results[f"test_{metric_name}"])
+    #         for metric_name in scoring_outer
+    #     ]
 
     for score_name, scores in cv_results:
         print(f"{score_name}: {scores.mean():.2f}+-{scores.std():.2f}")
@@ -127,8 +129,8 @@ def get_svm_results(
 
         results_rbf_svm = [
             (
-                ml_dataset[0],
-                nested_crossval_svm(*ml_dataset, **kwargs),
+                ml_dataset.name,
+                nested_crossval_svm(ml_dataset, **kwargs),
             )
             for ml_dataset in ml_datasets
         ]
@@ -173,7 +175,8 @@ def plot_results_long(
     df_results_long: pd.DataFrame,
     output_folder_path: str,
     test_name: str,
-    metrics_include: list = ["f1_macro", "balanced_accuracy"],
+    figsize:tuple = (12,6),
+    metrics_include: list = ["F1", "Precision", "Recall"],
 ):
     plot_order = (
         pd.concat(
@@ -198,6 +201,7 @@ def plot_results_long(
         df_results_long_plt = df_results_long_plt.drop("Metric", axis=1).rename(
             columns={"Value": metric_name}
         )
+    plt.figure(figsize=figsize, dpi=300)
     sns.boxplot(
         df_results_long_plt,
         x="Feature",
@@ -209,7 +213,8 @@ def plot_results_long(
     plt.ylim((0, 1.05))
     plt.grid(True, alpha=0.5)
     plt.yticks(np.arange(0, 1.1, 0.1))
-    plt.savefig(output_folder_path + test_name, bbox_inches="tight", dpi=300)
+    metrics_str = "_".join(["F1 Macro", "Precision", "Recall"]).replace(" ", "-")
+    plt.savefig(output_folder_path + test_name + metrics_str, bbox_inches="tight", dpi=300)
 
 
 # TODO This whole cell as function
@@ -229,12 +234,10 @@ def find_outliers(X: np.array):
 
 def outlier_check(dataset_full, ml_datasets: list, threshold: float = 0.8):
 
-    outliers = np.array(
-        [find_outliers(X) for feature_name, X, _, sample_names, _ in ml_datasets]
-    )
+    outliers = np.array([find_outliers(ml_dataset.X) for ml_dataset in ml_datasets])
 
     df_outliers = (
-        pd.Series(index=ml_datasets[0][3], data=outliers.sum(axis=0))
+        pd.Series(index=ml_datasets[0].sample_names, data=outliers.sum(axis=0))
         .sort_values(ascending=False)
         .to_frame(name="outlier_count")
         .join(dataset_full[0].protein_names)
