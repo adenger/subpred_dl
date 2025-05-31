@@ -31,7 +31,7 @@ def filter_no_3Di_available(dataset_full, remove_unequal_len:bool=True):
     return dataset_full_filtered
 
 
-def get_classification_subset(dataset_full, go_terms: list):
+def get_classification_subset(dataset_full, go_terms: list, remove_duplicates:bool=False):
     # dataset_full: tuple of df_sequences, df_uniprot_goa created with protein_go_datasets.py
     df_sequences, df_uniprot_goa = dataset_full[0].copy(), dataset_full[1].copy()
     df_uniprot_goa = (
@@ -42,9 +42,12 @@ def get_classification_subset(dataset_full, go_terms: list):
         .reset_index(drop=True)
     ).set_index("Uniprot")
     # Transporters that are annotated with both terms (might happen for other datasets)
-    assert (
-        not df_uniprot_goa.index.duplicated().any()
-    ), "Some proteins are annotated with two or more of the GO terms simultaneously"
+    if remove_duplicates:
+        df_uniprot_goa = df_uniprot_goa[~df_uniprot_goa.index.duplicated(keep="first")]
+    else:
+        assert (
+            not df_uniprot_goa.index.duplicated().any()
+        ), "Some proteins are annotated with two or more of the GO terms simultaneously"
     df_sequences = df_sequences[
         df_sequences.index.isin(df_uniprot_goa.index)
     ]

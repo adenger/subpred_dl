@@ -1,6 +1,7 @@
 """
 @author: adenger
 """
+
 from subpred.protein_dataset import get_sequence_dataset
 from subpred.go_annotations import get_go_annotations_subset
 from subpred.cdhit import cd_hit
@@ -14,6 +15,7 @@ import multiprocessing
 # "ecoli": 		83333
 # "yeast": 		559292
 
+
 def get_uniprot_go_dataset(
     organism_ids: set = None,
     swissprot_only: bool = False,
@@ -21,11 +23,11 @@ def get_uniprot_go_dataset(
     max_sequence_evidence_code: int = 1,
     additional_proteins: set = None,
     remove_proteins_without_gene_names: bool = True,
-    root_go_term:str="transmembrane transporter activity",
-    inner_go_relations:set={"is_a"},
-    go_uniprot_relations:set={"enables"},
-    namespaces_keep:set={"molecular_function"},
-    annotations_evidence_codes_remove:set={"IEA"}
+    root_go_term: str = "transmembrane transporter activity",
+    inner_go_relations: set = {"is_a"},
+    go_uniprot_relations: set = {"enables"},
+    namespaces_keep: set = {"molecular_function"},
+    annotations_evidence_codes_remove: set = {"IEA"},
 ):
     """Creates the data that is used by many of the remaining methods as input
 
@@ -47,7 +49,7 @@ def get_uniprot_go_dataset(
         remove_proteins_without_gene_names (bool, optional):
             Remove proteins that have not been annotated with a gene name in Uniprot. Defaults to True.
         root_go_term (str, optional):
-            GO term that is used as the root of the new GO subset/slim, e.g. "transmembrane transporter activity" or "plasma membrane". 
+            GO term that is used as the root of the new GO subset/slim, e.g. "transmembrane transporter activity" or "plasma membrane".
             More abstract terms increase the size of the GO graph exponentially, and therefore the running time when searching for ancestors.
             If large subsets are required then optimize the get_go_annotations_subset.__add_ancestors method, e.g. with CUDA or joblib
         inner_go_relations (set, optional):
@@ -90,6 +92,7 @@ def get_uniprot_go_dataset(
 
     return df_sequences, df_uniprot_goa
 
+
 def get_transmembrane_transporter_dataset(
     organism_ids: set = None,
     swissprot_only: bool = False,
@@ -124,12 +127,12 @@ def get_transmembrane_transporter_dataset(
         df_uniprot_goa: GO annotations for proteins
     """
     df_sequences, df_uniprot_goa = get_uniprot_go_dataset(
-        organism_ids = organism_ids,
-        swissprot_only = swissprot_only,
-        datasets_path = datasets_path,
-        max_sequence_evidence_code = max_sequence_evidence_code,
-        additional_proteins = additional_proteins,
-        remove_proteins_without_gene_names = remove_proteins_without_gene_names,
+        organism_ids=organism_ids,
+        swissprot_only=swissprot_only,
+        datasets_path=datasets_path,
+        max_sequence_evidence_code=max_sequence_evidence_code,
+        additional_proteins=additional_proteins,
+        remove_proteins_without_gene_names=remove_proteins_without_gene_names,
         root_go_term="transmembrane transporter activity",
         inner_go_relations={"is_a"},
         go_uniprot_relations={"enables"},
@@ -140,9 +143,33 @@ def get_transmembrane_transporter_dataset(
     return df_sequences, df_uniprot_goa
 
 
+def count_children(dataset_organism, go_term: str, **kwargs):
+
+    df_goa = dataset_organism[1]
+    matching_go_ids = df_goa[df_goa.go_term == go_term].go_id.drop_duplicates()
+    assert len(matching_go_ids == 1), matching_go_ids
+    go_id = str(matching_go_ids.iloc[0])
+
+    network = load_data("go_obo", **kwargs)
+
+    predecessors = set(network.predecessors(go_id)) | {go_id}
+
+    return (
+        df_goa[df_goa.go_id_ancestor.isin(predecessors)][
+            ["Uniprot", "go_term_ancestor"]
+        ]
+        .drop_duplicates()
+        .groupby("go_term_ancestor")
+        .count()
+        .sort_values("Uniprot", ascending=False)
+    )
+
+
 def get_stats(df_sequences, df_uniprot_goa, dataset_path="../data/datasets/"):
 
-    df_sequences_merge = df_sequences.join(load_data("uniprot", folder_path=dataset_path)["gene_names"], how="left")
+    df_sequences_merge = df_sequences.join(
+        load_data("uniprot", folder_path=dataset_path)["gene_names"], how="left"
+    )
     df_sequences_merge["has_gene_name"] = ~df_sequences_merge.gene_names.isnull()
     df_sequences_merge = df_sequences_merge.drop(
         ["gene_names", "protein_names"], axis=1
