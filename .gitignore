@@ -197,3 +197,4 @@ data/results/*.pickle
 data/results/*.png
 
 data/tmp_data/*.pickle
+backup/backup_*.tar*
