@@ -129,7 +129,8 @@ def get_nlp_features(
     df_embeddings.columns = [
         f"{feature_name}_{dim_count}" for dim_count in range(df_embeddings.shape[1])
     ]
+    assert df_embeddings.isnull().sum().sum() == 0, "missing values in embeddings"
     # prevent overflow warnings during printing, automatically select the best type
-    df_embeddings = df_embeddings.convert_dtypes(convert_floating=True)
+    df_embeddings = df_embeddings.astype('float64')#.convert_dtypes(convert_floating=True)
 
     return df_embeddings
