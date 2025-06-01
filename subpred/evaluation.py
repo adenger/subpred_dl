@@ -58,6 +58,7 @@ def nested_crossval_svm(
     n_jobs_outer: int = -1,
     scoring_inner: str = "balanced_accuracy",
     scoring_outer: dict = {"Balanced Accuracy": "balanced_accuracy"},
+    svm_C1:bool=False
 ):
     print(f"=== {ml_dataset.name} ===")
     model = make_pipeline(
@@ -72,6 +73,8 @@ def nested_crossval_svm(
         "svc__C": [0.1, 1, 10],
         "svc__gamma": ["scale"],
     }
+    if svm_C1:
+        param_grid["svc__C"] = [1]
     # scale : 1 / (n_features * X.var()).
     # larger variance and more features leads to a smoother decision boundary,
     # where each sample has less influence
