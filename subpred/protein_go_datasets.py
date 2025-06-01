@@ -15,7 +15,7 @@ import multiprocessing
 # "ecoli": 		83333
 # "yeast": 		559292
 
-
+# TODO turn methods into dataclass
 def get_uniprot_go_dataset(
     organism_ids: set = None,
     swissprot_only: bool = False,
@@ -143,10 +143,9 @@ def get_transmembrane_transporter_dataset(
     return df_sequences, df_uniprot_goa
 
 
-def count_children(dataset_organism, go_term: str, **kwargs):
-
-    df_goa = dataset_organism[1]
-    matching_go_ids = df_goa[df_goa.go_term == go_term].go_id.drop_duplicates()
+def count_children(df_uniprot_goa, go_term: str, **kwargs):
+    # df_goa = dataset_organism[1]
+    matching_go_ids = df_uniprot_goa[df_uniprot_goa.go_term == go_term].go_id.drop_duplicates()
     assert len(matching_go_ids == 1), matching_go_ids
     go_id = str(matching_go_ids.iloc[0])
 
@@ -155,7 +154,7 @@ def count_children(dataset_organism, go_term: str, **kwargs):
     predecessors = set(network.predecessors(go_id)) | {go_id}
 
     return (
-        df_goa[df_goa.go_id_ancestor.isin(predecessors)][
+        df_uniprot_goa[df_uniprot_goa.go_id_ancestor.isin(predecessors)][
             ["Uniprot", "go_term_ancestor"]
         ]
         .drop_duplicates()
@@ -163,6 +162,25 @@ def count_children(dataset_organism, go_term: str, **kwargs):
         .count()
         .sort_values("Uniprot", ascending=False)
     )
+
+def get_interpro_annotations(df_uniprot_goa, type: str, **kwargs):
+    assert type in [
+        "Family",
+        "Domain",
+        "Repeat",
+        "Homologous_superfamily",
+        "Conserved_site",
+        "Binding_site",
+        "Active_site",
+        "PTM",
+    ]
+    df_interpro = load_data("interpro", **kwargs)
+    df_interpro = (
+        df_interpro[df_interpro.Uniprot.isin(df_uniprot_goa.index.unique()) & (df_interpro.type == type)]
+        .sort_values("Uniprot")
+        .reset_index(drop=True)
+    )
+    return df_interpro
 
 
 def get_stats(df_sequences, df_uniprot_goa, dataset_path="../data/datasets/"):
