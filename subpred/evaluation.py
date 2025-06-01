@@ -216,8 +216,8 @@ def plot_results_long(
     plt.ylim((0, 1.05))
     plt.grid(True, alpha=0.5)
     plt.yticks(np.arange(0, 1.1, 0.1))
-    metrics_str = "_".join(["F1 Macro", "Precision", "Recall"]).replace(" ", "-")
-    plt.savefig(output_folder_path + test_name + metrics_str, bbox_inches="tight", dpi=300)
+    metrics_str = "_".join(metrics_include).replace(" ", "-")
+    plt.savefig(output_folder_path + test_name +"_"+ metrics_str, bbox_inches="tight", dpi=300)
 
 
 # TODO This whole cell as function
