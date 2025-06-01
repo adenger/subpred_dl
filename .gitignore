@@ -198,3 +198,4 @@ data/results/*.png
 
 data/tmp_data/*.pickle
 backup/backup_*.tar*
+data/raw/interpro/interpro_entries.tsv
