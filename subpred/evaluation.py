@@ -53,19 +53,20 @@ def nested_crossval_svm(
     ml_dataset: MLDataset,
     outer_cv: int = 5,
     inner_cv: int = 5,
-    repeats: int = 10,
+    repeats: int = 1,
     n_jobs_inner: int = 1,
     n_jobs_outer: int = -1,
     scoring_inner: str = "balanced_accuracy",
     scoring_outer: dict = {"Balanced Accuracy": "balanced_accuracy"},
-    svm_C1:bool=False
+    svm_C1: bool = False,
+    max_k: int = 200,
 ):
     print(f"=== {ml_dataset.name} ===")
     model = make_pipeline(
         VarianceThreshold(), StandardScaler(), DynamicSelectKBest(), SVC()
     )
 
-    max_features = min(len(ml_dataset.feature_names), 200)
+    max_features = min(len(ml_dataset.feature_names), max_k)
 
     param_grid = {
         "dynamicselectkbest__k": list(range(1, max_features, 1)),
@@ -178,20 +179,24 @@ def plot_results_long(
     df_results_long: pd.DataFrame,
     output_folder_path: str,
     test_name: str,
-    figsize:tuple = (12,6),
+    plot_order: list = None,  # of x axis
+    y_max: float = 1.05,
+    figsize: tuple = (12, 6),
+    plot_type: str = "box",  # "bar", "box"
     metrics_include: list = ["F1", "Precision", "Recall"],
 ):
-    plot_order = (
-        pd.concat(
-            [
-                df_results_long.groupby("Feature").Value.median().rename("median"),
-                df_results_long.groupby("Feature").Value.std().rename("std"),
-            ],
-            axis=1,
+    if not plot_order:
+        plot_order = (
+            pd.concat(
+                [
+                    df_results_long.groupby("Feature").Value.median().rename("median"),
+                    df_results_long.groupby("Feature").Value.std().rename("std"),
+                ],
+                axis=1,
+            )
+            .sort_values(["median", "std"], ascending=[True, False])
+            .index
         )
-        .sort_values(["median", "std"], ascending=[True, False])
-        .index
-    )
 
     df_results_long_plt = df_results_long[df_results_long.Metric.isin(metrics_include)]
     df_results_long_plt = df_results_long_plt.assign(
@@ -205,7 +210,14 @@ def plot_results_long(
             columns={"Value": metric_name}
         )
     plt.figure(figsize=figsize, dpi=300)
-    sns.boxplot(
+    match plot_type:
+        case "box":
+            plot_func = sns.boxplot
+        case "bar":
+            plot_func = sns.barplot
+        case x:
+            raise ValueError(f"unknown plot type {x}")
+    plot_func(
         df_results_long_plt,
         x="Feature",
         y="Value" if multiple_metrics else metric_name,
@@ -213,11 +225,13 @@ def plot_results_long(
         order=plot_order,
     )
     plt.xticks(rotation=90)
-    plt.ylim((0, 1.05))
+    plt.ylim((0, y_max))
     plt.grid(True, alpha=0.5)
     plt.yticks(np.arange(0, 1.1, 0.1))
     metrics_str = "_".join(metrics_include).replace(" ", "-")
-    plt.savefig(output_folder_path + test_name +"_"+ metrics_str, bbox_inches="tight", dpi=300)
+    plt.savefig(
+        output_folder_path + test_name + "_" + metrics_str, bbox_inches="tight", dpi=300
+    )
 
 
 # TODO This whole cell as function
