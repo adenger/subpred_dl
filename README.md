@@ -12,18 +12,21 @@
 
 TODO export exact env
 
-### Create environment
+### Create environment, install code
 
 ```bash
-conda env create -f environment.yml
+conda env create -f environment_full.yml
 conda activate subpred_deeplearning
+pip install -e .
 ```
 
-At the moment, the DNN notebooks need a different envirnoment where tensorflow-cpu is installed, as there is an issue with the current Nvidia GPU generation and stable version of TF. Once the stable version of TF is officially compatible, this will be changed to run on the GPU. The instructions to build the second environment are in the DNN notebook. The SVM notebook needs to be executed first to generate the feature data (and some of the feature algorithms use CUDA).
+At the moment, the DNN notebooks need a different envirnoment where tensorflow-cpu is installed, as there is an issue with the current Nvidia GPU generation and stable version of TF. Once the stable version of TF is officially compatible, this will be changed to run on the GPU. 
 
-### Install code into environment
+The SVM notebooks need to be executed first to generate the feature data, then the environment for the dnn notebooks can be recreated and activated with:
 
 ```bash
+conda env create -f environment_dnn_cpu_full.yml
+conda activate dnn_cpu
 pip install -e .
 ```
 
@@ -52,7 +55,7 @@ TODO turn notebook into py
 ```bash
 ./preprocessing/create_blastdbs.sh
 ./preprocessing/create_3Di_fasta.sh
-./preprocessing/create_datasets.py
+./preprocessing/create_datasets.py  # TODO
 ```
 
 ## Download/update and process raw data
@@ -106,6 +109,14 @@ GO version 2025-03-16
 ```
 
 Uniref version 2022_1
+
+### Download interpro annotation names
+
+```bash
+./preprocessing/download_interpro.sh
+```
+
+Downloaded version 2025-04-22
 
 <!-- TODO docker container with only data/datasets. -->
 
