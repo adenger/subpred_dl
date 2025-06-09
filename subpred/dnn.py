@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
+
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import (
     RepeatedStratifiedKFold,
@@ -107,6 +108,10 @@ def create_model_dynamic_layers(n_features):
 
 
 from sklearn.utils.class_weight import compute_class_weight
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+
+# from keras.wrappers import SKLearnClassifier
 
 
 def crossval_dnn(
@@ -119,6 +124,8 @@ def crossval_dnn(
     batch_size=8,
     verbose=False,
     calculate_class_weights=False,
+    upsample=False,
+    undersample=False,
 ):
     print(f"=== {ml_dataset.name} ===")
     preprocess = make_pipeline(VarianceThreshold(0.0), StandardScaler())
@@ -141,10 +148,16 @@ def crossval_dnn(
         X_train = preprocess.fit_transform(X_train, y_train)
         X_test = preprocess.transform(X_test)
 
+        if undersample:
+            resampler = RandomUnderSampler(random_state=0)
+            X_train, y_train = resampler.fit_resample(X_train, y_train)
+
+        if upsample:
+            resampler = SMOTE(random_state=0)
+            X_train, y_train = resampler.fit_resample(X_train, y_train)
+
         # important: create from scratch to reset weights
         model = model_func(X_train.shape[1])
-        # TODO Early Stopping can be an option for larger datasets (less overfitting, faster training)
-        # TODO class weights option
         class_weights_dict = None
         if calculate_class_weights:
             classes = np.sort(np.unique(y_train))
@@ -179,6 +192,7 @@ def crossval_dnn(
     df_scores = pd.DataFrame(test_scores, columns=["Feature", "Metric", "Value"])
 
     return df_scores
+
 
 # Example dict:
 # scoring_outer = {
