@@ -45,7 +45,7 @@ def get_classification_subset(dataset_full, go_terms: list, remove_duplicates:bo
     # Transporters that are annotated with both terms (might happen for other datasets)
     if remove_duplicates:
         print(f"found {len(df_uniprot_goa.index[df_uniprot_goa.index.duplicated()].unique())} duplicates")
-        df_uniprot_goa = df_uniprot_goa[~df_uniprot_goa.index.duplicated(keep="first")]
+        df_uniprot_goa = df_uniprot_goa[~df_uniprot_goa.index.duplicated(keep=False)]
     else:
         assert (
             not df_uniprot_goa.index.duplicated().any()
