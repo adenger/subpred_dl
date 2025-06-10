@@ -7,9 +7,10 @@ import pandas as pd
 from subpred.structural_sequences import get_3Di_sequences
 from subpred.cdhit import cd_hit
 
+# TODO turn this file into class
 
 def cluster_sequences(dataset_full, identity_threshold: int):
-    # dataset_full: tuple of df_sequences, df_uniprot_goa created with protein_go_datasets.py
+    # dataset_full: tuple of df_sequences, df_uniprot_goa created with get_classification_subset
     df_sequences, df_uniprot_goa = dataset_full[0].copy(), dataset_full[1].copy()
     cluster_representatives = set(
         cd_hit(df_sequences.sequence, identity_threshold=identity_threshold)
@@ -20,7 +21,7 @@ def cluster_sequences(dataset_full, identity_threshold: int):
 
 
 def filter_no_3Di_available(dataset_full, remove_unequal_len:bool=True):
-    # dataset_full: tuple of df_sequences, df_uniprot_goa created with protein_go_datasets.py
+    # dataset_full: tuple of df_sequences, df_uniprot_goa created with get_classification_subset
     # remove_unequal_len: remove proteins where lengths of 3Di and AA sequence do not match
     # function to remove proteins that don't have all features available
     accessions_3Di_available = get_3Di_sequences(dataset_full[0].index, remove_unequal_len=remove_unequal_len).index
@@ -43,6 +44,7 @@ def get_classification_subset(dataset_full, go_terms: list, remove_duplicates:bo
     ).set_index("Uniprot")
     # Transporters that are annotated with both terms (might happen for other datasets)
     if remove_duplicates:
+        print(f"found {len(df_uniprot_goa.index[df_uniprot_goa.index.duplicated()].unique())} duplicates")
         df_uniprot_goa = df_uniprot_goa[~df_uniprot_goa.index.duplicated(keep="first")]
     else:
         assert (
