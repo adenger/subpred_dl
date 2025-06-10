@@ -16,7 +16,8 @@ import multiprocessing
 # "yeast": 		559292
 
 
-# TODO turn methods into dataclass
+# TODO turn this file into dataclass
+
 def get_uniprot_go_dataset(
     organism_ids: set = None,
     swissprot_only: bool = False,
@@ -144,7 +145,16 @@ def get_transmembrane_transporter_dataset(
     return df_sequences, df_uniprot_goa
 
 
-def count_children(df_uniprot_goa, go_term: str, **kwargs):
+from subpred.go_annotations import get_go_subgraph
+
+
+def count_children(
+    df_uniprot_goa,
+    go_term: str,
+    keys: set = {"is_a"},
+    namespaces: set = {"molecular_function"},
+    **kwargs,
+):
     # df_goa = dataset_organism[1]
     matching_go_ids = df_uniprot_goa[
         df_uniprot_goa.go_term == go_term
@@ -153,6 +163,8 @@ def count_children(df_uniprot_goa, go_term: str, **kwargs):
     go_id = str(matching_go_ids.iloc[0])
 
     network = load_data("go_obo", **kwargs)
+    if keys or namespaces:
+        network = get_go_subgraph(graph_go=network, root_node=go_id,keys=keys, namespaces=namespaces)
 
     predecessors = set(network.predecessors(go_id)) | {go_id}
 
