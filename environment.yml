@@ -36,3 +36,4 @@ dependencies:
   - mini3di
   - biopython
   - bioconda::foldseek
+  - imbalanced-learn=0.13.0

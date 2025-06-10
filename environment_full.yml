@@ -178,6 +178,7 @@ dependencies:
   - hyperframe=6.1.0=pyhd8ed1ab_0
   - icu=75.1=he02047a_0
   - idna=3.10=pyhd8ed1ab_1
+  - imbalanced-learn=0.13.0=pyhd8ed1ab_0
   - importlib-metadata=8.6.1=pyha770c72_0
   - importlib_resources=6.5.2=pyhd8ed1ab_0
   - ipykernel=6.29.5=pyh3099207_0
@@ -466,6 +467,7 @@ dependencies:
   - sentencepiece-spm=0.2.0=h8e10757_10
   - setuptools=80.1.0=pyhff2d567_0
   - six=1.17.0=pyhd8ed1ab_0
+  - sklearn-compat=0.1.3=pyhd8ed1ab_0
   - sleef=3.8=h1b44611_0
   - snappy=1.2.1=h8bd8927_1
   - sniffio=1.3.1=pyhd8ed1ab_1

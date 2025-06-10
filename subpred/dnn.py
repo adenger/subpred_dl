@@ -1,3 +1,6 @@
+"""
+@author: adenger
+"""
 from tensorflow import keras
 import numpy as np
 import pandas as pd
@@ -8,7 +11,11 @@ from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import (
     RepeatedStratifiedKFold,
 )
+from sklearn.utils.class_weight import compute_class_weight
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
 
+# from keras.wrappers import SKLearnClassifier
 
 # Test result AT sugar amino: the three models perform very similarly, just use the simplest one (create_model)
 # Tried different values for dropout (0.0,0.3,0.5,0.7), performance for non-0 is similar.
@@ -107,11 +114,7 @@ def create_model_dynamic_layers(n_features):
     return model
 
 
-from sklearn.utils.class_weight import compute_class_weight
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
 
-# from keras.wrappers import SKLearnClassifier
 
 
 def crossval_dnn(

@@ -6,11 +6,9 @@
 
 - Linux (tested on Ubuntu 24.04 LTS)
 - [miniforge](https://github.com/conda-forge/miniforge)
-- At least 64GB memory
+- At least 64GB of memory
 - Up to 500GB disk storage
-- GPU compatible with CUDA Toolkit 12.6
-
-TODO export exact env
+- To re-calculate embeddings (optional): GPU compatible with CUDA Toolkit 12.6+
 
 ### Create environment, install code
 
@@ -20,9 +18,9 @@ conda activate subpred_deeplearning
 pip install -e .
 ```
 
-At the moment, the DNN notebooks need a different envirnoment where tensorflow-cpu is installed, as there is an issue with the current Nvidia GPU generation and stable version of TF. Once the stable version of TF is officially compatible, this will be changed to run on the GPU. 
+A separate environment is used for the DNN notebooks. All package versions are the same, except that the dnn_cpu environment uses the CPU version of tensorflow to train DNNs, whereas the subpred_deeplearning environment contains the CUDA-accellerated variant of the package to generate embeddings on the GPU. The DNN training is currently incompatible with the latest generation of Nvidia GPUs. The CPU version of TF also ensures full reproducibility of all results.
 
-The SVM notebooks need to be executed first to generate the feature data, then the environment for the dnn notebooks can be recreated and activated with:
+The SVM notebooks need to be executed first to generate the feature data, then the environment for the dnn notebooks (and the *plots_tables_human* notebook) can be recreated with:
 
 ```bash
 conda env create -f environment_dnn_cpu_full.yml
