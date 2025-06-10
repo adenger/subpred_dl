@@ -60,7 +60,7 @@ def get_ml_datasets(features_list: list, series_labels: pd.Series):
 
 
 def get_features(dataset_full: tuple, include_pssm_features: bool = True):
-    # dataset_full: generated with protein_go_datasets.py
+    # dataset_full: generated with dataset_filters.py
     # Can take a long time if cache is empty
     df_sequences, df_uniprot_goa = dataset_full[0].copy(), dataset_full[1].copy()
     series_sequences = df_sequences.sequence
