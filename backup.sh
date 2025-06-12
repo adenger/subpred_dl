@@ -8,3 +8,4 @@ tar cf - data/results | pigz > backup/backup_results.tar.gz
 tar cf - data/tmp_data | pigz > backup/backup_tmp_data.tar.gz
 tar cf - data/datasets | pigz > backup/backup_datasets.tar.gz
 tar cf - data/raw | pigz > backup/backup_rawdata.tar.gz
+cp env*.yml backup/
