@@ -1,4 +1,4 @@
-# subpred_deeplearning
+# Membrane transporter substrate prediction with deep learning methods
 
 ## Installation
 
