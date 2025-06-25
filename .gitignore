@@ -198,4 +198,5 @@ data/results/*.png
 
 data/tmp_data/*.pickle
 backup/backup_*.tar*
+backup/environment*.yml
 data/raw/interpro/interpro_entries.tsv
