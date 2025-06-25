@@ -29,21 +29,25 @@ pip install -e .
 
 The raw data is available here:
 
-/data/raw (...GB)
+[/data/raw (113GB)]()
 
 Running the **01_preprocessing** notebook will turn the raw data into pre-processed pickles. To vastly speed up the feature computation, we saved the PSSMs and embeddings that we calculated for all proteins in the dataset in a cache folder. Once they are extracted into the appropriate folder, the feature generation methods will read these files instead of calculating everything from scratch. The preprocessed pickles, along with cached PSSMs and embeddings, are available for download here:
 
-/data/datasets (...GB)
+[/data/datasets (1.4GB)]()
 
 After extracting the data into the matching folders (tar -xf from the root directory of the repository), the notebooks can be re-calculated. Here, it is important to run the svm notebooks (02-07) first with the *subpred_deeplearning* conda environment, and then the dnn notebooks (08-14) with the *dnn_cpu* environment, for reasons mentioned above. The ML feature data that is created by the SVM notebooks and subsequently read by the DNN notebooks is, alternatively, also saved in an archive that can be downloaded here:
 
-/data/tmp_data  (...GB)
+[/data/tmp_data (37MB)](https://1drv.ms/u/c/886666fa46e5db95/EUXwykta-7pLsUj1dTIhfk0B8VptAZYJ-RHs3LyHNYWueg?e=EukKna)
+
+Finally, the evaluation scores from all iterations of the repeated 5-fold cross validation, along with generated plots, are available here:
+
+[/data/results (3MB)](https://1drv.ms/u/c/886666fa46e5db95/ESccd6GL03lLsKx_pHsF3KcBVH4qUwkp15f2E04ffg6vtA?e=RDzgEU)
 
 ## How the raw data was assembled
 
 All commands used to assemble /data/raw were saved in the preprocessing folder. **Note that these scripts always download the latest version of each database, and the contents of the datasets might change in the future**. Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025. They were executed in this order:
 
-#### GO annotations
+### GO annotations
 
 ```bash
 ./preprocessing/download_goa.sh
