@@ -8,8 +8,7 @@
 - [miniforge](https://github.com/conda-forge/miniforge)
 - To recreate feature datasets (optional): 
     - Up to 500GB disk storage (for BLAST databases), 64GB Memory (psiblast)
-- To re-calculate embeddings (optional): 
-    - GPU compatible with CUDA Toolkit 12.6+, >=16GB VRAM
+    - GPU compatible with CUDA Toolkit 12.6+, >=16GB VRAM (embeddings)
 
 ### Create environment, install project code as python package
 
@@ -45,7 +44,7 @@ Finally, the evaluation scores from all iterations of the repeated 5-fold cross 
 
 [/data/results (3MB)](https://1drv.ms/u/c/886666fa46e5db95/ESccd6GL03lLsKx_pHsF3KcBVH4qUwkp15f2E04ffg6vtA?e=RDzgEU)
 
-## How the raw data was assembled
+## How the raw data was assembled (do not run)
 
 All commands used to assemble /data/raw were saved in the preprocessing folder. **Note that these scripts always download the latest version of each database, and the contents of the datasets might change in the future**. Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025. They were executed in this order:
 
