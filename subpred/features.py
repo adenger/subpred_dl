@@ -140,7 +140,7 @@ def get_features(dataset_full: tuple, include_pssm_features: bool = True):
         # PSSMs take very long time for large datasets
         # therefore we exclude these features for proteome searching
         pssm_folder = "../data/datasets/pssm/"
-        blastdb_folder = "../data/datasets/blastdb/"
+        blastdb_folder = "../data/raw/blastdb/"
         verbosity_pssm = 1  # only print if no pssm found
         df_pssm_50_1 = calculate_pssm_feature(
             series_sequences,

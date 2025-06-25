@@ -181,14 +181,13 @@ data/raw/alphafolddb/tarfiles/*.tar
 data/raw/alphafolddb/pdbs/*.pdb*
 data/raw/alphafolddb/foldseekdb/queryDB*
 data/raw/alphafolddb/*.fasta
+data/raw/blastdb/uniref50/uniref50*
+data/raw/blastdb/uniref90/uniref90*
 
 
-data/datasets/blastdb/uniref50/uniref50*
-data/datasets/blastdb/uniref90/uniref90*
 data/datasets/pssm/pssm_uniref*/*.pssm
 data/datasets/pssm/pssm_uniref*/*.fasta
 data/datasets/*.*pickle
-data/datasets/proteins_nonstandard_aminoacids.txt
 data/datasets/embeddings/*.npy
 
 data/data_backup_subpred_dl_170525.tar
