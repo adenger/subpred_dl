@@ -30,7 +30,7 @@ pip install -e .
 
 The raw data is available here:
 
-[/data/raw (113GB)]()
+[/data/raw (113GB)](https://1drv.ms/u/c/886666fa46e5db95/EYpQvp0O-G9EsvFw4ZFaSvwB3LSWCF0L2qD77VUccFlUnQ?e=82mHc5)
 
 Running the **01_preprocessing** notebook will turn the raw data into pre-processed pickles. To vastly speed up the feature computation, we saved the PSSMs and embeddings that we calculated for all proteins in the dataset in a cache folder. Once they are extracted into the appropriate folder, the feature generation methods will read these files instead of calculating everything from scratch. The preprocessed pickles, along with cached PSSMs and embeddings, are available for download here:
 
