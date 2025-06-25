@@ -41,9 +41,9 @@ After extracting the data into the matching folders (tar -xf from the root direc
 
 ## How the raw data was assembled
 
-All commands used to assemble /data/raw were saved in the preprocessing folder. Note that these scripts always download the latest version of each database, and the contents of the datasets might change in the future. Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025. They were executed in this order:
+All commands used to assemble /data/raw were saved in the preprocessing folder. **Note that these scripts always download the latest version of each database, and the contents of the datasets might change in the future**. Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025. They were executed in this order:
 
-### Download go annotations
+#### GO annotations
 
 ```bash
 ./preprocessing/download_goa.sh
@@ -51,7 +51,7 @@ All commands used to assemble /data/raw were saved in the preprocessing folder. 
 
 GOA UniProt (version 226), released on 06 May, 2025 and assembled using the publicly released data available in the source databases on 28 April, 2025.
 
-### Download AlphafoldDB PDB files for model organisms
+### AlphafoldDB PDB files for model organisms
 
 ```bash
 ./preprocessing/download_alphafolddb.sh
@@ -61,15 +61,16 @@ Version 4 released in 2022, downloaded on 15.05.2025
 
 Additional tar files from alphafolddb (https://www.alphafold.ebi.ac.uk/download) can be added to the script, to include more organisms. They will automatically be pre-processed.
 
-### Download uniprot data (conda env must be active)
+### Uniprot data
 
 ```bash
+conda activate subpred_deeplearning
 ./preprocessing/download_uniprot.sh
 ```
 
 Uniprot Version 2025_02 released on 23.04.2025
 
-### Download go ontology
+### GO OBO
 
 ```bash
 ./preprocessing/download_go.sh
@@ -77,7 +78,7 @@ Uniprot Version 2025_02 released on 23.04.2025
 
 GO version 2025-03-16
 
-### Download uniref, create blast databases (conda env must be active)
+### Uniref
 
 ```bash
 ./preprocessing/download_uniref.sh
@@ -85,7 +86,7 @@ GO version 2025-03-16
 
 Uniref version 2022_1
 
-### Download interpro annotation names
+### Interpro annotation names
 
 ```bash
 ./preprocessing/download_interpro.sh
@@ -96,6 +97,7 @@ Downloaded version 2025-04-22
 ### Create 3Di fasta file and blast databases:
 
 ```bash
+conda activate subpred_deeplearning
 ./preprocessing/create_blastdbs.sh
 ./preprocessing/create_3Di_fasta.sh
 ```
