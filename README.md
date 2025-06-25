@@ -4,13 +4,12 @@
 
 ### Requirements
 
-- Linux (tested on Ubuntu 24.04 LTS)
+- Linux (tested on Ubuntu 24.04 LTS in WSL2)
 - [miniforge](https://github.com/conda-forge/miniforge)
-- At least 64GB of memory
-- Up to 500GB disk storage
-- To re-calculate embeddings (optional): GPU compatible with CUDA Toolkit 12.6+
+- To recreate feature datasets (optional): Up to 500GB disk storage (for BLAST databases), 64GB Memory (psiblast)
+- To re-calculate embeddings (optional): GPU compatible with CUDA Toolkit 12.6+, >=16GB VRAM
 
-### Create environment, install code
+### Create environment, install project code as python package
 
 ```bash
 conda env create -f environment_full.yml
@@ -18,9 +17,7 @@ conda activate subpred_deeplearning
 pip install -e .
 ```
 
-A separate environment is used for the DNN notebooks. All package versions are the same, except that the dnn_cpu environment uses the CPU version of tensorflow to train DNNs, whereas the subpred_deeplearning environment contains the CUDA-accellerated variant of the package to generate embeddings on the GPU. The DNN training is currently incompatible with the latest generation of Nvidia GPUs. The CPU version of TF also ensures full reproducibility of all results.
-
-The SVM notebooks need to be executed first to generate the feature data, then the environment for the dnn notebooks (and the *plots_tables_human* notebook) can be recreated with:
+A separate environment is used for the DNN notebooks (notebooks 08-14). All package versions are the same, except that the dnn_cpu environment uses the CPU version of tensorflow to train DNNs, whereas the subpred_deeplearning environment contains the CUDA-accellerated variant of the package to generate embeddings on the GPU. The DNN training is currently incompatible with the latest generation of Nvidia GPUs. The CPU version of TF also ensures full reproducibility of all results.
 
 ```bash
 conda env create -f environment_dnn_cpu_full.yml
@@ -30,41 +27,21 @@ pip install -e .
 
 ## Recreating results from manuscript
 
-Links to the pre-processed datasets used in the study are provided here:
+The raw data is available here:
 
-data/datasets (..GB)
+/data/raw (...GB)
 
-To re-create the manuscript results from pre-processed data, only this archive is needed.
+Running the **01_preprocessing** notebook will turn the raw data into pre-processed pickles. To vastly speed up the feature computation, we saved the PSSMs and embeddings that we calculated for all proteins in the dataset in a cache folder. Once they are extracted into the appropriate folder, the feature generation methods will read these files instead of calculating everything from scratch. The preprocessed pickles, along with cached PSSMs and embeddings, are available for download here:
 
-## Recreate pre-processing
+/data/datasets (...GB)
 
-The raw data can be downloaded here:
+After extracting the data into the matching folders (tar -xf from the root directory of the repository), the notebooks can be re-calculated. Here, it is important to run the svm notebooks (02-07) first with the *subpred_deeplearning* conda environment, and then the dnn notebooks (08-14) with the *dnn_cpu* environment, for reasons mentioned above. The ML feature data that is created by the SVM notebooks and subsequently read by the DNN notebooks is, alternatively, also saved in an archive that can be downloaded here:
 
-data/raw (..GB)
+/data/tmp_data  (...GB)
 
-Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025.
+## How the raw data was assembled
 
-TODO place Uniref2022 in raw data folder.
-
-The preprocessing of raw data can then be carried out manually via:
-
-TODO turn notebook into py
-
-```bash
-./preprocessing/create_blastdbs.sh
-./preprocessing/create_3Di_fasta.sh
-./preprocessing/create_datasets.py  # TODO
-```
-
-## Download/update and process raw data
-
-To re-create the project entirely from scratch, the download and the initial pre-processing is also listed in the preprocessing/download*.sh scripts.
-
-File formats of GO and Uniprot can change in the future, making the code incompatible. Changes between current and future database versions might affect the results.
-
-Link to raw data is provided above.
-
-All except Uniref updated on 11.05.2025
+All commands used to assemble /data/raw were saved in the preprocessing folder. Note that these scripts always download the latest version of each database, and the contents of the datasets might change in the future. Uniref is version 2022_01 (contains enough proteins to create evolutionary profiles, and we already had pre-calculated PSSMs for most proteins from a previous project), everything else was downloaded on 11.05.2025. They were executed in this order:
 
 ### Download go annotations
 
@@ -80,7 +57,7 @@ GOA UniProt (version 226), released on 06 May, 2025 and assembled using the publ
 ./preprocessing/download_alphafolddb.sh
 ```
 
-Version 4 from 2022, downloaded on 15.05.2025
+Version 4 released in 2022, downloaded on 15.05.2025
 
 Additional tar files from alphafolddb (https://www.alphafold.ebi.ac.uk/download) can be added to the script, to include more organisms. They will automatically be pre-processed.
 
@@ -115,6 +92,14 @@ Uniref version 2022_1
 ```
 
 Downloaded version 2025-04-22
+
+### Create 3Di fasta file and blast databases:
+
+```bash
+./preprocessing/create_blastdbs.sh
+./preprocessing/create_3Di_fasta.sh
+```
+
 
 <!-- TODO docker container with only data/datasets. -->
 
