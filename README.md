@@ -1,4 +1,4 @@
-# Membrane transporter substrate prediction with deep learning methods
+# Application of Protein Structure Encodings and Sequence Embeddings for Transporter Substrate Prediction
 
 ## Installation
 
