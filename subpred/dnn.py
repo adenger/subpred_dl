@@ -17,13 +17,6 @@ from imblearn.under_sampling import RandomUnderSampler
 
 # from keras.wrappers import SKLearnClassifier
 
-# Test result AT sugar amino: the three models perform very similarly, just use the simplest one (create_model)
-# Tried different values for dropout (0.0,0.3,0.5,0.7), performance for non-0 is similar.
-# Dropout 0.5 for smaller datasets, maybe try 0.3 for larger
-# Tried different values for batch_size. Not really a big difference. 8 for smaller (less overfitting), 16 or 32 for larger (more speed)
-# TODO put this code into subpred package, once TF is compatible with new GPU
-
-
 def create_model(n_features):
     # Larger datasets: try lower dropout
     # Try starting at lower number of nodes

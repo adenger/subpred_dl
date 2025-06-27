@@ -233,10 +233,6 @@ def plot_results_long(
         output_folder_path + test_name + "_" + metrics_str+".png", bbox_inches="tight", dpi=300
     )
 
-
-# TODO This whole cell as function
-
-
 def find_outliers(X: np.array):
     outlier_detector = make_pipeline(
         StandardScaler(),

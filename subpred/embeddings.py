@@ -88,7 +88,7 @@ def get_nlp_features(
     # supports caching of results for faster loading
     # sequences: index uniprot accession, value sequence,
     #            lowercase for 3Di, uppercase for amino acid, only 20 AAs allowed
-    # model: one of protT5, prostT5, TODO more could be implemented with https://github.com/sacdallago/bio_embeddings
+    # model: one of protT5, prostT5, more could be implemented with https://github.com/sacdallago/bio_embeddings
     # sequence_type: AA or 3Di
     # half_precision: if false, weights and embeddings are fp32 instead of fp16,
     #                 uses more resources but more digits after comma. cpu only supports fp32
