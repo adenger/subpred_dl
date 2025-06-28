@@ -7,7 +7,7 @@
 - Linux (tested on Ubuntu 24.04 LTS in WSL2)
 - [miniforge](https://github.com/conda-forge/miniforge)
 - To recreate feature datasets (optional): 
-    - Up to 500GB disk storage (for BLAST databases), 64GB Memory (psiblast)
+    - Up to 200GB disk storage (PSSMs, for BLAST databases)
     - GPU compatible with CUDA Toolkit 12.6+, >=16GB VRAM (embeddings)
 
 ### Create environment, install project code as python package
